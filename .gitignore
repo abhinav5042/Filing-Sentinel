@@ -1,0 +1,16 @@
+﻿.env
+__pycache__/
+*.pyc
+**/data/chroma/
+**/data/raw/
+**/data/*.db
+**/data/company_tickers.json
+**/data/chunks.json
+node_modules/
+dist/
+.DS_Store
+venv/
+*.egg-info/
+*.log
+.vite/
+*.lnk

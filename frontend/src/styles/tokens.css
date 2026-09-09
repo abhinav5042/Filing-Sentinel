@@ -1,0 +1,71 @@
+﻿:root {
+  --fs-bg: #080a08;
+  --fs-panel: #0d100d;
+  --fs-card: #10140f;
+  --fs-card-hover: #141910;
+  --fs-dropdown: #0d100d;
+  --fs-hover-bg: #161c14;
+  --fs-active-bg: #1a2116;
+
+  --fs-border: #1c2a1e;
+  --fs-border-strong: #263a28;
+  --fs-border-hover: #34502f;
+  --fs-border-chip: #1f2e20;
+
+  --fs-text-primary: #d7ead9;
+  --fs-text-body: #cde0cf;
+  --fs-text-secondary: #7f9a82;
+  --fs-text-muted: #57705a;
+  --fs-text-faint: #3c4f3e;
+  --fs-text-label: #a9c9ac;
+
+  --fs-accent: #39ff14;
+  --fs-accent-hover: #6dff55;
+  --fs-accent-label: #4fd88a;
+  --fs-accent-bg: rgba(57, 255, 20, 0.12);
+  --fs-accent-bg-hover: rgba(57, 255, 20, 0.2);
+  --fs-accent-border: rgba(57, 255, 20, 0.35);
+
+  --fs-success: #39ff14;
+  --fs-success-text: #6dff55;
+  --fs-danger-text: #ff5f56;
+
+  --fs-font-sans: IBM Plex Mono, monospace;
+  --fs-font-mono: IBM Plex Mono, monospace;
+
+  --fs-radius-sm: 5px;
+  --fs-radius-md: 7px;
+  --fs-radius-lg: 9px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  background: var(--fs-bg);
+  color: var(--fs-text-primary);
+  font-family: var(--fs-font-sans);
+  text-align: left;
+}
+
+#root {
+  text-align: left;
+}
+
+a {
+  color: var(--fs-accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--fs-accent-hover);
+}
+
+input::placeholder {
+  color: var(--fs-text-muted);
+}
+
+::selection {
+  background: rgba(57, 255, 20, 0.25);
+}
