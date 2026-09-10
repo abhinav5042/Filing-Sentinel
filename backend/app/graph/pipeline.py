@@ -6,7 +6,7 @@ run_query() function that both the CLI script and the FastAPI backend can call.
 import os
 from typing import TypedDict, List
 from dotenv import load_dotenv
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_cohere import CohereEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -33,7 +33,7 @@ class GraphState(TypedDict):
     trace: List[str]
 
 
-embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+embeddings = CohereEmbeddings(model="embed-english-v3.0")
 vector_store = Chroma(
     collection_name="sec_10k_filings",
     embedding_function=embeddings,
@@ -231,3 +231,4 @@ def run_query(question, company):
         "trace": result["trace"],
         "grounded": result["generation_grounded"],
     }
+

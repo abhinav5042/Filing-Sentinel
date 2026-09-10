@@ -8,7 +8,7 @@ companies can be queried without pre-loading everything in advance.
 import os
 import time
 from dotenv import load_dotenv
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_cohere import CohereEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
@@ -20,10 +20,10 @@ load_dotenv()
 
 CHROMA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "chroma")
 RAW_DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data", "raw")
-EMBED_BATCH_SIZE = 64
-EMBED_DELAY = 0
+EMBED_BATCH_SIZE = 90
+EMBED_DELAY = 0.7
 
-embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+embeddings = CohereEmbeddings(model="embed-english-v3.0")
 vector_store = Chroma(
     collection_name="sec_10k_filings",
     embedding_function=embeddings,
@@ -59,7 +59,7 @@ def embed_documents_with_retry(documents, report):
                 succeeded = True
                 break
             except Exception as e:
-                if "429" in str(e) or "ResourceExhausted" in str(e) or "quota" in str(e).lower():
+                if "429" in str(e) or "ResourceExhausted" in str(e) or "quota" in str(e).lower() or "rate limit" in str(e).lower():
                     wait_time = EMBED_DELAY * (2 ** attempt)
                     report(f"  Rate limited, waiting {wait_time:.0f}s (retry {attempt}/{MAX_RETRIES})...")
                     time.sleep(wait_time)
@@ -207,3 +207,5 @@ if __name__ == "__main__":
     test_company = input("Enter a company name or ticker to test: ").strip()
     result = ensure_company_ingested(test_company)
     print(f"\nResolved company: {result}")
+
+
