@@ -27,7 +27,10 @@ def _contains_any(text, options):
     return any(opt in text for opt in options)
 
 
-def _parse_markdown_table(markdown):
+import re
+
+def _clean_row(row):
+    """Merge a lone '):
     lines = [line.strip() for line in markdown.strip().split("\n") if line.strip()]
     if len(lines) < 2:
         return None
@@ -36,8 +39,8 @@ def _parse_markdown_table(markdown):
         cells = line.strip().strip("|").split("|")
         return [c.strip() for c in cells]
 
-    headers = parse_row(lines[0])
-    data_rows = [parse_row(line) for line in lines[2:]]
+    headers = _clean_row(parse_row(lines[0]))
+    data_rows = [_clean_row(parse_row(line)) for line in lines[2:]]
 
     return {"headers": headers, "rows": data_rows}
 
@@ -82,4 +85,79 @@ def get_financial_tables(company_name):
         result[key] = chosen
 
     return result
+
+ sign into the following cell, and drop empty
+    spacer cells left over from the original HTML table's alignment
+    columns, so rows render with consistent, meaningful cells."""
+    cleaned = []
+    i = 0
+    while i < len(row):
+        cell = row[i].strip()
+        if cell == "$" and i + 1 < len(row) and row[i + 1].strip():
+            cleaned.append(f"${row[i + 1].strip()}")
+            i += 2
+        elif cell:
+            cleaned.append(cell)
+            i += 1
+        else:
+            i += 1
+    return cleaned
+
+def _parse_markdown_table(markdown):
+    lines = [line.strip() for line in markdown.strip().split("\n") if line.strip()]
+    if len(lines) < 2:
+        return None
+
+    def parse_row(line):
+        cells = line.strip().strip("|").split("|")
+        return [c.strip() for c in cells]
+
+    headers = _clean_row(parse_row(lines[0]))
+    data_rows = [_clean_row(parse_row(line)) for line in lines[2:]]
+
+    return {"headers": headers, "rows": data_rows}
+
+
+def _looks_like_real_data_table(parsed):
+    if not parsed:
+        return False
+
+    number_pattern = re.compile(r"\(?-?\$?\d[\d,]*\)?%?")
+    numeric_cell_count = 0
+
+    for row in parsed["rows"]:
+        for cell in row:
+            if number_pattern.fullmatch(cell.strip()):
+                numeric_cell_count += 1
+
+    return numeric_cell_count >= MIN_NUMERIC_CELLS
+
+
+def get_financial_tables(company_name):
+    result = {}
+
+    for key, query in STATEMENT_QUERIES.items():
+        docs = vector_store.similarity_search(
+            query, k=CANDIDATES_PER_STATEMENT,
+            filter={"$and": [{"company": company_name}, {"is_table": True}]},
+        )
+
+        chosen = None
+        keyword_groups = REQUIRED_KEYWORDS[key]
+
+        for doc in docs:
+            parsed = _parse_markdown_table(doc.page_content)
+            if not _looks_like_real_data_table(parsed):
+                continue
+
+            lowered_text = doc.page_content.lower()
+            if all(_contains_any(lowered_text, group) for group in keyword_groups):
+                chosen = parsed
+                break
+
+        result[key] = chosen
+
+    return result
+
+
 
