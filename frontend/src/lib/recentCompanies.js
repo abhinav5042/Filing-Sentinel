@@ -19,3 +19,4 @@ export function addRecentCompany({ name, ticker }) {
   }
   return updated;
 }
+

@@ -243,3 +243,4 @@ const inputStyle = {
   font: "400 13.5px var(--fs-font-sans)",
   outline: "none",
 };
+

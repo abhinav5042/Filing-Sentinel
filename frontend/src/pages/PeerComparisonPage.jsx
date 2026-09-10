@@ -2,7 +2,7 @@
 import { useAuth } from "../lib/AuthContext";
 import "../styles/tokens.css";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 async function comparePeers(companies, token) {
   const response = await fetch(`${API_BASE_URL}/peer-comparison`, {
@@ -200,3 +200,4 @@ const navBtnStyle = {
   textAlign: "left",
   width: "100%",
 };
+

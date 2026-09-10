@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useAuth } from "../lib/AuthContext";
 import { getFilingSummary } from "../lib/api";
 import "../styles/tokens.css";
@@ -142,7 +142,7 @@ export default function SummaryPage({ company, onBackToHome, onGoToChat, onGoToD
                     {summary.key_risks.map((risk, i) => (
                       <div key={i} style={{ paddingBottom: i < summary.key_risks.length - 1 ? 14 : 0, borderBottom: i < summary.key_risks.length - 1 ? "1px solid var(--fs-border)" : "none" }}>
                         <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                          <span style={{ color: "var(--fs-accent)", fontSize: 8, marginTop: 6 }}>●</span>
+                          <span style={{ color: "var(--fs-accent)", fontSize: 8, marginTop: 6 }}>â—</span>
                           <div style={{ fontSize: 13, lineHeight: 1.55, color: "var(--fs-text-body)" }}>{risk}</div>
                         </div>
                       </div>
@@ -330,3 +330,4 @@ const secondaryBtnStyle = {
   font: "500 12.5px var(--fs-font-sans)",
   cursor: "pointer",
 };
+
