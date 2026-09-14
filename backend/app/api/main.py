@@ -108,6 +108,7 @@ class FinancialsResponse(BaseModel):
     income_statement: dict | None
     balance_sheet: dict | None
     cash_flow: dict | None
+    units: str | None
 
 
 class MemoCreateRequest(BaseModel):
@@ -350,6 +351,7 @@ def financials(request: FinancialsRequest, current_user: User = Depends(get_curr
         "income_statement": result.get("income_statement"),
         "balance_sheet": result.get("balance_sheet"),
         "cash_flow": result.get("cash_flow"),
+        "units": result.get("units"),
     }
 
 
@@ -520,6 +522,8 @@ def query(request: QueryRequest, current_user: User = Depends(get_current_user))
 
     result = run_query(request.question, resolved_company["name"])
     return result
+
+
 
 
 

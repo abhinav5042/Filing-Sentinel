@@ -3,6 +3,26 @@ import { useAuth } from "../lib/AuthContext";
 import { getFinancials } from "../lib/api";
 import "../styles/tokens.css";
 
+function unitSuffix(units) {
+  if (units === "billions") return "B";
+  if (units === "thousands") return "K";
+  if (units === "millions") return "M";
+  return "";
+}
+
+function formatCell(cell, suffix) {
+  if (!suffix) return cell;
+  const dollarMatch = cell.match(/^(\(?\$[\d,]+\)?)$/);
+  if (dollarMatch) {
+    const isNegative = cell.startsWith("(");
+    if (isNegative) {
+      return cell.replace(")", `${suffix})`);
+    }
+    return `${cell}${suffix}`;
+  }
+  return cell;
+}
+
 export default function FinancialsPage({ company, onBackToHome, onGoToChat, onGoToSummary, onGoToDiff }) {
   const { token, logout } = useAuth();
   const [data, setData] = useState(null);
@@ -28,6 +48,8 @@ export default function FinancialsPage({ company, onBackToHome, onGoToChat, onGo
     };
   }, [company, token]);
 
+  const suffix = data ? unitSuffix(data.units) : "";
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--fs-bg)", color: "var(--fs-text-primary)", fontFamily: "var(--fs-font-sans)", fontSize: 14, lineHeight: 1.5 }}>
       <nav style={{ width: 224, flex: "none", background: "var(--fs-panel)", borderRight: "1px solid var(--fs-border)", display: "flex", flexDirection: "column", padding: "18px 12px" }}>
@@ -50,12 +72,17 @@ export default function FinancialsPage({ company, onBackToHome, onGoToChat, onGo
       </nav>
 
       <main style={{ flex: 1, minWidth: 0, padding: "40px 56px", textAlign: "left" }}>
-        <h1 style={{ margin: "0 0 28px", fontSize: 28, fontWeight: 600, letterSpacing: "-0.6px" }}>
+        <h1 style={{ margin: "0 0 4px", fontSize: 28, fontWeight: 600, letterSpacing: "-0.6px" }}>
           {company} - Financial Statements
         </h1>
+        {data?.units && (
+          <div style={{ font: "400 12px var(--fs-font-mono)", color: "var(--fs-text-muted)", marginBottom: 24 }}>
+            Figures in {data.units}
+          </div>
+        )}
 
         {loading && (
-          <div style={{ display: "flex", alignItems: "center", gap: 9, font: "500 11px var(--fs-font-mono)", letterSpacing: ".08em", color: "var(--fs-text-secondary)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, font: "500 11px var(--fs-font-mono)", letterSpacing: ".08em", color: "var(--fs-text-secondary)", marginTop: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--fs-accent)" }} />
             Retrieving statements from the 10-K...
           </div>
@@ -65,9 +92,9 @@ export default function FinancialsPage({ company, onBackToHome, onGoToChat, onGo
 
         {data && (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            <StatementTable title="Income Statement" table={data.income_statement} />
-            <StatementTable title="Balance Sheet" table={data.balance_sheet} />
-            <StatementTable title="Cash Flow Statement" table={data.cash_flow} />
+            <StatementTable title="Income Statement" table={data.income_statement} suffix={suffix} />
+            <StatementTable title="Balance Sheet" table={data.balance_sheet} suffix={suffix} />
+            <StatementTable title="Cash Flow Statement" table={data.cash_flow} suffix={suffix} />
           </div>
         )}
       </main>
@@ -75,7 +102,7 @@ export default function FinancialsPage({ company, onBackToHome, onGoToChat, onGo
   );
 }
 
-function StatementTable({ title, table }) {
+function StatementTable({ title, table, suffix }) {
   return (
     <div>
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fs-text-secondary)", marginBottom: 10 }}>
@@ -94,7 +121,7 @@ function StatementTable({ title, table }) {
                 <tr key={i} style={{ borderBottom: i < table.rows.length - 1 ? "1px solid var(--fs-border)" : "none" }}>
                   {row.filter((cell) => cell !== "").map((cell, j) => (
                     <td key={j} style={{ padding: "7px 12px", color: j === 0 ? "var(--fs-text-body)" : "var(--fs-text-primary)", whiteSpace: "nowrap" }}>
-                      {cell}
+                      {formatCell(cell, suffix)}
                     </td>
                   ))}
                 </tr>
@@ -121,4 +148,3 @@ const navBtnStyle = {
   textAlign: "left",
   width: "100%",
 };
-
